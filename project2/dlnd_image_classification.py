@@ -79,8 +79,8 @@ tests.test_folder_path(cifar10_dataset_folder_path)
 # In[2]:
 
 
-get_ipython().magic(u'matplotlib inline')
-get_ipython().magic(u"config InlineBackend.figure_format = 'retina'")
+get_ipython().magic('matplotlib inline')
+get_ipython().magic("config InlineBackend.figure_format = 'retina'")
 
 import helper
 import numpy as np
@@ -280,7 +280,7 @@ tests.test_nn_keep_prob_inputs(neural_net_keep_prob_input)
 # **注意**：对于**此层**，**请勿使用** [TensorFlow Layers](https://www.tensorflow.org/api_docs/python/tf/layers) 或 [TensorFlow Layers (contrib)](https://www.tensorflow.org/api_guides/python/contrib.layers)，但是仍然可以使用 TensorFlow 的 [Neural Network](https://www.tensorflow.org/api_docs/python/tf/nn) 包。对于所有**其他层**，你依然可以使用快捷方法。
 # 
 
-# In[8]:
+# In[17]:
 
 
 def conv2d_maxpool(x_tensor, conv_num_outputs, conv_ksize, conv_strides, pool_ksize, pool_strides):
@@ -295,7 +295,7 @@ def conv2d_maxpool(x_tensor, conv_num_outputs, conv_ksize, conv_strides, pool_ks
     : return: A tensor that represents convolution and max pooling of x_tensor
     """
     # TODO: Implement Function
-    weights = tf.Variable(tf.truncated_normal(list(conv_ksize)+[x_tensor.shape.as_list()[3],conv_num_outputs]))
+    weights = tf.Variable(tf.truncated_normal(list(conv_ksize)+[x_tensor.shape.as_list()[3],conv_num_outputs],stddev=5e-2))
     bias = tf.Variable(tf.zeros(conv_num_outputs))
     strides = [1,conv_strides[0],conv_strides[1],1]
     pool_filter = [1,pool_ksize[0],pool_ksize[1],1]
@@ -319,7 +319,7 @@ tests.test_con_pool(conv2d_maxpool)
 # 实现 `flatten` 函数，将 `x_tensor` 的维度从四维张量（4-D tensor）变成二维张量。输出应该是形状（*部分大小（Batch Size）*，*扁平化图片大小（Flattened Image Size）*）。快捷方法：对于此层，你可以使用 [TensorFlow Layers](https://www.tensorflow.org/api_docs/python/tf/layers) 或 [TensorFlow Layers (contrib)](https://www.tensorflow.org/api_guides/python/contrib.layers) 包中的类。如果你想要更大挑战，可以仅使用其他 TensorFlow 程序包。
 # 
 
-# In[9]:
+# In[18]:
 
 
 def flatten(x_tensor):
@@ -344,7 +344,7 @@ tests.test_flatten(flatten)
 # 
 # 实现 `fully_conn` 函数，以向 `x_tensor` 应用完全连接的层级，形状为（*部分大小（Batch Size）*，*num_outputs*）。快捷方法：对于此层，你可以使用 [TensorFlow Layers](https://www.tensorflow.org/api_docs/python/tf/layers) 或 [TensorFlow Layers (contrib)](https://www.tensorflow.org/api_guides/python/contrib.layers) 包中的类。如果你想要更大挑战，可以仅使用其他 TensorFlow 程序包。
 
-# In[21]:
+# In[19]:
 
 
 def fully_conn(x_tensor, num_outputs):
@@ -355,7 +355,7 @@ def fully_conn(x_tensor, num_outputs):
     : return: A 2-D tensor where the second dimension is num_outputs.
     """
     # TODO: Implement Function
-    weights = tf.Variable(tf.truncated_normal(shape=[x_tensor.shape.as_list()[1],num_outputs],stddev=0.003))
+    weights = tf.Variable(tf.truncated_normal(shape=[x_tensor.shape.as_list()[1],num_outputs],stddev=0.04))
     bias = tf.Variable(tf.zeros(num_outputs))
     
     return tf.nn.relu(tf.add(tf.matmul(x_tensor,weights),bias))
@@ -373,7 +373,7 @@ tests.test_fully_conn(fully_conn)
 # 
 # **注意**：该层级不应应用 Activation、softmax 或交叉熵（cross entropy）。
 
-# In[22]:
+# In[20]:
 
 
 def output(x_tensor, num_outputs):
@@ -384,7 +384,7 @@ def output(x_tensor, num_outputs):
     : return: A 2-D tensor where the second dimension is num_outputs.
     """
     # TODO: Implement Function
-    weights = tf.Variable(tf.truncated_normal(shape=[x_tensor.shape.as_list()[1],num_outputs],stddev=0.003))
+    weights = tf.Variable(tf.truncated_normal(shape=[x_tensor.shape.as_list()[1],num_outputs],stddev=0.04))
     bias = tf.Variable(tf.zeros(num_outputs))
     
     return tf.add(tf.matmul(x_tensor,weights),bias)
@@ -407,7 +407,7 @@ tests.test_output(output)
 # * 返回输出
 # * 使用 `keep_prob` 向模型中的一个或多个层应用 [TensorFlow 的 Dropout](https://www.tensorflow.org/api_docs/python/tf/nn/dropout)
 
-# In[56]:
+# In[21]:
 
 
 def conv_net(x, keep_prob):
@@ -422,7 +422,7 @@ def conv_net(x, keep_prob):
     # Function Definition from Above:
     #    conv2d_maxpool(x_tensor, conv_num_outputs, conv_ksize, conv_strides, pool_ksize, pool_strides)
     conv = conv2d_maxpool(x,64,[5,5],[1,1],[3,3],[2,2])
-    conv = conv2d_maxpool(x,64,[5,5],[1,1],[3,3],[2,2])
+    conv = conv2d_maxpool(x,128,[5,5],[1,1],[3,3],[2,2])
 
     # TODO: Apply a Flatten Layer
     # Function Definition from Above:
@@ -433,8 +433,8 @@ def conv_net(x, keep_prob):
     #    Play around with different number of outputs
     # Function Definition from Above:
     #   fully_conn(x_tensor, num_outputs)
-    full_conv = fully_conn(flat,392)
-    full_conv = fully_conn(full_conv,196)
+    full_conv = fully_conn(flat,512)
+    full_conv = fully_conn(full_conv,256)
     
     # TODO: Apply an Output Layer
     #    Set this to the number of classes
@@ -494,7 +494,7 @@ tests.test_conv_net(conv_net)
 # 注意：不需要返回任何内容。该函数只是用来优化神经网络。
 # 
 
-# In[57]:
+# In[22]:
 
 
 def train_neural_network(session, optimizer, keep_probability, feature_batch, label_batch):
@@ -526,7 +526,7 @@ tests.test_train_nn(train_neural_network)
 # 实现函数 `print_stats` 以输出损失和验证准确率。使用全局变量 `valid_features` 和 `valid_labels` 计算验证准确率。使用保留率 `1.0` 计算损失和验证准确率（loss and validation accuracy）。
 # 
 
-# In[58]:
+# In[23]:
 
 
 def print_stats(session, feature_batch, label_batch, cost, accuracy):
@@ -545,11 +545,11 @@ def print_stats(session, feature_batch, label_batch, cost, accuracy):
         keep_prob:1.0
     })
     acc = session.run(accuracy,feed_dict={
-        x:feature_batch,
-        y:label_batch,
+        x:valid_features,
+        y:valid_labels,
         keep_prob:1.0
     })
-    print("Loss:{0:>10.6f} -- Accuracy:{1:.6f}".format(loss,acc))
+    print("Cost:{0:>10.6f} -- Accuracy:{1:.6f}".format(loss,acc))
 
 
 # ### 超参数
@@ -564,12 +564,12 @@ def print_stats(session, feature_batch, label_batch, cost, accuracy):
 #  * ...
 # * 设置 `keep_probability` 表示使用丢弃时保留节点的概率
 
-# In[61]:
+# In[24]:
 
 
 # TODO: Tune Parameters
-epochs = 10
-batch_size = 256
+epochs = 64
+batch_size = 1000
 keep_probability = 0.75
 
 
@@ -578,7 +578,7 @@ keep_probability = 0.75
 # 我们先用单个部分，而不是用所有的 CIFAR-10 批次训练神经网络。这样可以节省时间，并对模型进行迭代，以提高准确率。最终验证准确率达到 50% 或以上之后，在下一部分对所有数据运行模型。
 # 
 
-# In[62]:
+# In[25]:
 
 
 """
@@ -602,7 +602,7 @@ with tf.Session() as sess:
 # 
 # 现在，单个 CIFAR-10 部分的准确率已经不错了，试试所有五个部分吧。
 
-# In[63]:
+# In[26]:
 
 
 """
@@ -638,14 +638,14 @@ with tf.Session() as sess:
 # 
 # 利用测试数据集测试你的模型。这将是最终的准确率。你的准确率应该高于 50%。如果没达到，请继续调整模型结构和参数。
 
-# In[65]:
+# In[27]:
 
 
 """
 DON'T MODIFY ANYTHING IN THIS CELL
 """
-get_ipython().magic(u'matplotlib inline')
-get_ipython().magic(u"config InlineBackend.figure_format = 'retina'")
+get_ipython().magic('matplotlib inline')
+get_ipython().magic("config InlineBackend.figure_format = 'retina'")
 
 import tensorflow as tf
 import pickle
